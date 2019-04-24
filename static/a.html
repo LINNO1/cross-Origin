@@ -1,0 +1,76 @@
+<html>
+<style>
+  .ct{
+    width: 1400px;
+    margin: auto;
+  }
+  .main{
+    float: left;
+    width: 600px;
+    height: 500px;
+    border: 1px solid #ccc;
+  }
+  .main input{
+    margin: 20px;
+    width: 200px;
+  }
+  .iframe{
+    float: right;
+  }
+  iframe{
+    width: 700px;
+    height: 500px;
+    border: 5px dashed #ccc;
+  }
+</style>
+
+<div class="ct">
+  <h1>使用降域实现跨域</h1>
+  <div class="main">
+    <p>1.若页面的URL为 http://b.test.com:8080/a.html,与嵌入的b.html同域,可通过window.frames[0].document来操控子页面</p>
+    <p>2.若页面的URL为 http://a.test.com:8080/a.html，跨域window.frames[0].document报错</p>
+    <p> 方式1： 在所有的页面 document.domain='test.com', 可获得window.frames[0].document</p>
+    <p> 方式2： window.postMessage不受同源政策的影响，得不到window.frames[0].document</p>
+    <label> 向b.html传值</label><input type="text" placeholder="http://a.test.com:8080/a.html">
+    <p> 用window.frames[0].document.cookie 获取子页面的cookie</p>
+    <button class='getCookie'> 获取cookie </button> <input type="text" id='cookieVal'>
+  </div>
+
+ <!-- b.html 页面的URL是http://b.test.com:8080/index.html不同域 -->
+  <iframe src="http://b.test.com:8080/b.html" frameborder="0" ></iframe>
+
+</div>
+
+
+<script>
+/*方式2： window.postMessage不受同源政策的影响，得不到子页面的cookie*/
+document.querySelector('.main input').addEventListener('input', function(){
+  console.log(this.value);
+  //通过window.postMessage跨域请求
+  window.frames[0].postMessage(this.value,'http://b.test.com:8080/index.html');
+
+ // window.frames[0].document.querySelector('#xdata').value = this.value;
+})
+
+
+document.querySelector('.getCookie').onclick=function(e){
+  try{
+      var a=window.frames[0].document;
+  }catch(err){
+    document.querySelector('#cookieVal').value=err.message;
+    return;
+  }
+  
+     document.querySelector('#cookieVal').value = a.cookie;
+ 
+  
+}
+
+//-------------方式1：降域，降域后可以获得子页面的cookie-----------
+/*document.domain = "test.com"
+document.querySelector('.main input').addEventListener('input', function(){
+  console.log(this.value);
+   window.frames[0].document.querySelector('#xdata').value = this.value;
+})*/
+</script>
+</html>
